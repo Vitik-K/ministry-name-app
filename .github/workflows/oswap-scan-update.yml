@@ -85,9 +85,9 @@ jobs:
         if: ${{ inputs.ZAP_GCP_PUBLISH }}
         run: |
           echo "$GCP_SA_KEY" > gcp-sa-key.json
-          gsutil mb gs://${{ inputs.ZAP_GCP_BUCKET }} || echo "Bucket already exists..."
-          gsutil cp public/zap/report_html.html gs://${{ inputs.ZAP_GCP_BUCKET }}
+          gcloud storage buckets create gs://${{ inputs.ZAP_GCP_BUCKET }} || echo "Bucket already exists..."
+          gcloud storage cp public/zap/report_html.html gs://${{ inputs.ZAP_GCP_BUCKET }}
           echo "URL expires in 10 minutes..."
-          gsutil signurl -d 10m gcp-sa-key.json gs://${{ inputs.ZAP_GCP_BUCKET }}/report_html.html
+          gcloud storage sign-url gs://${{ inputs.ZAP_GCP_BUCKET }}/report_html.html --duration=10m --private-key-file=gcp-sa-key.json
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
